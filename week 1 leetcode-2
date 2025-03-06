@@ -1,0 +1,44 @@
+int cmp(const void *a , const void *b )
+{
+    return *(int*)a - *(int*)b; 
+}
+
+
+void PushBack(int deck[static 1] , int size , int currFull)
+{
+    //Swap 
+    int end = deck[size-1];
+    deck[size-currFull-1] = end;
+
+    //PushBack
+    for(int i= size-1 ; i>=(size-currFull); i--)
+    {
+        deck[i] = deck[i-1];
+    }
+}
+
+
+int* 
+deckRevealedIncreasing(
+        int deck[static 1], 
+        int deckSize, 
+        int* returnSize // Reference
+    ) 
+{
+    int *res = malloc(sizeof(int) * deckSize);
+    *returnSize = deckSize;
+
+    qsort(deck,deckSize , sizeof(int) , cmp);
+
+    res[deckSize-1] = deck[deckSize-1];
+    int currFull = 1;
+
+    for(int i = deckSize - 2 ; i>= 0 ; --i )
+    {
+        PushBack(res,deckSize,currFull);
+        currFull++;
+        res[deckSize-currFull] = deck[i];
+    }
+    return res;
+    
+}
