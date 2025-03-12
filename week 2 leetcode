@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+#define MAX_COURSES 2001  // Adjusted limit for safety
+
+// Function to perform DFS and detect cycles
+bool DFS(int course, int preMap[MAX_COURSES][MAX_COURSES], int numCourses, int *visitedMap) {
+    if (visitedMap[course] == 1) return false; // Cycle detected
+    if (visitedMap[course] == 2) return true;  // Already checked
+
+    visitedMap[course] = 1; // Mark as visiting
+
+    for (int next = 0; next < numCourses; next++) {
+        if (preMap[course][next]) {  // If there's a prerequisite edge
+            if (!DFS(next, preMap, numCourses, visitedMap)) {
+                return false;
+            }
+        }
+    }
+
+    visitedMap[course] = 2; // Mark as visited
+    return true;
+}
+
+// Function to check if all courses can be finished
+bool canFinish(int numCourses, int** prerequisites, int prerequisitesSize, int* prerequisitesColSize) {
+    int preMap[MAX_COURSES][MAX_COURSES] = {0};
+    int visitedMap[MAX_COURSES] = {0}; // 0 = unvisited, 1 = visiting, 2 = visited
+
+    // Initialize adjacency matrix
+    memset(preMap, 0, sizeof(preMap));
+
+    for (int i = 0; i < prerequisitesSize; i++) {
+        int course = prerequisites[i][0];
+        int prereq = prerequisites[i][1];
+        preMap[prereq][course] = 1; // prereq → course
+    }
+
+    // Run DFS for each course
+    for (int i = 0; i < numCourses; i++) {
+        if (visitedMap[i] == 0) {
+            if (!DFS(i, preMap, numCourses, visitedMap)) {
+                return false; // Cycle detected
+            }
+        }
+    }
+
+    return true;
+}
