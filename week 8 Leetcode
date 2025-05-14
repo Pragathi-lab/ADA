@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+#define MAXN 12
+#define MAXQ (1 << MAXN) * MAXN
+
+typedef struct {
+    int node;
+    int mask;
+    int dist;
+} State;
+
+int shortestPathLength(int** graph, int graphSize, int* graphColSize) {
+    int allVisited = (1 << graphSize) - 1;
+    bool visited[MAXN][1 << MAXN] = { false };
+    
+    State queue[MAXQ];
+    int front = 0, rear = 0;
+
+    // Initialize queue with each node as starting point
+    for (int i = 0; i < graphSize; i++) {
+        int mask = 1 << i;
+        queue[rear++] = (State){i, mask, 0};
+        visited[i][mask] = true;
+    }
+
+    while (front < rear) {
+        State curr = queue[front++];
+
+        if (curr.mask == allVisited) {
+            return curr.dist;
+        }
+
+        for (int i = 0; i < graphColSize[curr.node]; i++) {
+            int neighbor = graph[curr.node][i];
+            int nextMask = curr.mask | (1 << neighbor);
+
+            if (!visited[neighbor][nextMask]) {
+                visited[neighbor][nextMask] = true;
+                queue[rear++] = (State){neighbor, nextMask, curr.dist + 1};
+            }
+        }
+    }
+
+    return -1;  // Should never reach here
+}
